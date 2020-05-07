@@ -12,6 +12,25 @@ local function switches(t)
 	return table.concat(switches_, " ")
 end
 
+local function debug(text)
+	local first = true
+	for line in text:gmatch('[^\n]+') do
+    	if first then
+        	print(string.format([[echo -debug %%@lua: %s@]], line))
+        	first = false
+    	else
+        	print(string.format([[echo -debug %%@    %s@]], line))
+    	end
+	end
+end
+
+local write = print
+
+if arg[1] == "-debug" then
+    write = debug
+    table.remove(arg, 1)
+end
+
 kak = setmetatable({}, {
     __index = function(_, command)
 		local words = { (command:gsub("_", "-")) }
@@ -28,7 +47,7 @@ kak = setmetatable({}, {
         		words[#words + 1] = string.format("'%s'", v)
     		end
 
-    		print(table.concat(words, " "))
+    		write(table.concat(words, " "))
     	end
     end
 })
@@ -41,8 +60,8 @@ local function compile(chunk)
 	if fn then return fn end
 
 	err = err:match('%[string "luar"%]:(.+)')
-	local message = "Error while parsing lua block\nlua %%{%s}\nLine %s\n"
-	io.stderr:write(message:format(chunk, err))
+	local message = "error while parsing lua block:\n \nlua %%{%s}\n \nLine %s\n "
+	debug(message:format(chunk, err))
 	os.exit(1)
 end
 
