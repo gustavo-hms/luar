@@ -70,7 +70,13 @@ local lambda = arg[#arg]
 arg[0], arg[#arg] = nil, nil
 
 for i, v in ipairs(arg) do
-    arg[i] = tonumber(v) or v
+    if arg[i] == "true" then
+        arg[i] = true
+    elseif arg[i] == "false" then
+        arg[i] = false
+    else
+        arg[i] = tonumber(v) or v
+    end
 end
 
 local fn = compile(lambda)
