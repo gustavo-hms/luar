@@ -32,7 +32,7 @@ lua 17 19 %{
 }
 ```
 
-Since Kakoune does not parse expansions inside this `lua %{}` blocks, this is the way you can inspect Kakoune's state:
+Since Kakoune does not process expansions inside these `lua %{}` blocks, you need to pass expansions as arguments if you need to inspect Kakoune's state:
 
 ```lua
 lua %val{client} %{
@@ -41,22 +41,15 @@ lua %val{client} %{
 }
 ```
 
-Finally, you can run Kakoune's commands from `lua` using the provided `kak` module:
+Finally, you can run all commands defined in Kakoune (including third party ones) from `lua` code using the provided `kak` module:
 
 ```lua
 lua %{
     kak.set_register("/", "Search this!")
+    kak.execute_keys('%s<ret>cSearch that!<esc>')
 }
 ```
-As you can see, hyphens are replaced with underscores in command names.
-
-Switches can be passed as a table in the last argument of a command:
-
-```lua
-lua %{
-    kak.info("Olha aqui!", { anchor = "10.5", style = "above", markup = true })
-}
-```
+As you can see, hyphens are replaced by underscores in command names.
 
 ## Some examples
 The following examples are for didactic purposes. There are other ways to achieve the same results.
@@ -75,15 +68,15 @@ Now suppose you want to define a mapping to toggle the highlight of search patte
 declare-option -hidden bool highlight_search_on false
 
 define-command highlight-search-toggle %{ lua %opt{highlight_search_on} %{
-	local isactive = args()
+    local isactive = args()
 
-	if isactive then
-		kak.remove_highlighter "window/highlight-search"
-	else
-		kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
-	end
+    if isactive then
+        kak.remove_highlighter "window/highlight-search"
+    else
+        kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
+    end
 
-	kak.set_option("window", "highlight_search_on", not isactive)
+    kak.set_option("window", "highlight_search_on", not isactive)
 } }
 
 map global normal <F2> ': highlight-search-toggle<ret>'
@@ -91,7 +84,7 @@ map global normal <F2> ': highlight-search-toggle<ret>'
 
 ## Instalation
 
-You must first install `lua` in your system. Then you can add the following line to your `kakrc` (supposing you use [plug.kak](andreyorst/plug.kak)):
+You must have a `lua` interpreter installed on your system. Then you can add the following line to your `kakrc` (supposing you use [plug.kak](https://github.com/andreyorst/plug.kak)):
 
 ```kak
 plug "gustavo-hms/luar"

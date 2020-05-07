@@ -1,17 +1,3 @@
-local function switches(t)
-	local switches_ = {}
-
-	for switch, value in pairs(t) do
-    	if value == true then
-        	switches_[#switches_ + 1] = "-" .. switch
-    	else
-        	switches_[#switches_ + 1] = string.format("-%s '%s'", switch, value)
-    	end
-	end
-
-	return table.concat(switches_, " ")
-end
-
 local function debug(text)
 	local first = true
 	for line in text:gmatch('[^\n]+') do
@@ -34,16 +20,9 @@ end
 kak = setmetatable({}, {
     __index = function(_, command)
 		local words = { (command:gsub("_", "-")) }
+
     	return function(...)
-    		local args = {...}
-    		local last = args[#args]
-
-    		if type(last) == "table" then
-        		words[2] = switches(last)
-        		args[#args] = nil
-    		end
-
-    		for _, v in ipairs(args) do
+    		for _, v in ipairs({...}) do
         		words[#words + 1] = string.format("'%s'", v)
     		end
 
