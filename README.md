@@ -82,7 +82,7 @@ define-command highlight-search-toggle %{ lua %opt{highlight_search_on} %{
 map global normal <F2> ': highlight-search-toggle<ret>'
 ```
 
-## Instalation
+## Installation
 
 You must have a `lua` interpreter installed on your system. Then you can add the following line to your `kakrc` (supposing you use [plug.kak](https://github.com/andreyorst/plug.kak)):
 
