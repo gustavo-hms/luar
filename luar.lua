@@ -1,6 +1,6 @@
 local function debug(text)
 	local first = true
-	for line in text:gmatch('[^\n]+') do
+	for line in text:gmatch('[^\n]*') do
     	if first then
         	print(string.format([[echo -debug %%@lua: %s@]], line))
         	first = false
@@ -39,7 +39,7 @@ local function compile(chunk)
 	if fn then return fn end
 
 	err = err:match('%[string "luar"%]:(.+)')
-	local message = "error while parsing lua block:\n \nlua %%{%s}\n \nLine %s\n "
+	local message = "error while parsing lua block:\n\nlua %%{%s}\n\nLine %s\n"
 	debug(message:format(chunk, err))
 	os.exit(1)
 end
