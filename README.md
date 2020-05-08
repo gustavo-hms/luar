@@ -68,16 +68,16 @@ Now suppose you want to define a mapping to toggle the highlight of search patte
 declare-option -hidden bool highlight_search_on false
 
 define-command highlight-search-toggle %{ lua %opt{highlight_search_on} %{
-    local isactive = args()
+    local is_on = args()
 
-    if isactive then
+    if is_on then
         kak.remove_highlighter "window/highlight-search"
     else
         kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
     end
 
-    kak.set_option("window", "highlight_search_on", not isactive)
-} }
+    kak.set_option("window", "highlight_search_on", not is_on)
+}}
 
 map global normal <F2> ': highlight-search-toggle<ret>'
 ```
