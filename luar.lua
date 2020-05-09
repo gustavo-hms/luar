@@ -49,9 +49,9 @@ local lambda = arg[#arg]
 arg[0], arg[#arg] = nil, nil
 
 for i, v in ipairs(arg) do
-	if arg[i] == "true" then
+	if v == "true" then
 		arg[i] = true
-	elseif arg[i] == "false" then
+	elseif v == "false" then
 		arg[i] = false
 	else
 		arg[i] = tonumber(v) or v
@@ -60,6 +60,7 @@ end
 
 local fn = compile(lambda)
 local result = { fn() }
+
 if #result > 0 then
 	print("echo " .. table.concat(result, "\t"))
 end
