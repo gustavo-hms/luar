@@ -10,6 +10,13 @@ local function debug(text)
 	end
 end
 
+local function abort(action, chunk, err)
+	err = err:match('%[string "luar"%]:(.+)')
+	local message = "error while %s lua block:\n\nlua %%{%s}\n\nline %s\n"
+	debug(message:format(action, chunk, err))
+	os.exit(1)
+end
+
 local write = print
 
 if arg[1] == "-debug" then
@@ -46,24 +53,13 @@ for i, v in ipairs(arg) do
 	end
 end
 
-local function abort(action, err)
-	err = err:match('%[string "luar"%]:(.+)')
-	local message = "error while %s lua block:\n\nlua %%{%s}\n\nline %s\n"
-	debug(message:format(action, chunk, err))
-	os.exit(1)
-end
-
-local function check(success, ...)
-	local result = {...}
-	if success then return result end
-	abort("executing", result[1])
-end
-
 local fn, err = load(chunk, "luar")
-if not fn then abort("parsing", err) end
+if not fn then abort("parsing", chunk, err) end
 
-local result = check(pcall(fn))
+local results = { pcall(fn) }
+if not results[1] then abort("executing", chunk, results[2]) end
 
-if #result > 0 then
-	print("echo " .. table.concat(result, "\t"))
+if #results > 1 then
+	table.remove(results, 1)
+	print("echo " .. table.concat(results, "\t"))
 end
