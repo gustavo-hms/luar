@@ -25,16 +25,19 @@ if arg[1] == "-debug" then
 end
 
 kak = setmetatable({}, {
-	__index = function(_, command)
-		local words = { (command:gsub("_", "-")) }
+	__index = function(t, command)
+		local name = command:gsub("_", "-")
+		t[command] = function(...)
+			local words = { name }
 
-		return function(...)
-			for _, v in ipairs({...}) do
+			for _, v in ipairs {...} do
 				words[#words + 1] = string.format("'%s'", v)
 			end
 
 			write(table.concat(words, " "))
 		end
+
+		return t[command]
 	end
 })
 
