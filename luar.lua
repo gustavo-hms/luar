@@ -31,9 +31,10 @@ kak = setmetatable({}, {
 	end
 })
 
+args = function() return table.unpack(arg) end
+
 local chunk = arg[#arg]
--- Remove reference to file's name and to chunk
-arg[0], arg[#arg] = nil, nil
+arg[0], arg[#arg] = nil, nil -- Hide file name and chunk
 
 for i, v in ipairs(arg) do
 	if v == "true" then
@@ -45,8 +46,6 @@ for i, v in ipairs(arg) do
 	end
 end
 
-args = function() return table.unpack(arg) end
-
 local function abort(action, err)
 	err = err:match('%[string "luar"%]:(.+)')
 	local message = "error while %s lua block:\n\nlua %%{%s}\n\nline %s\n"
@@ -54,24 +53,16 @@ local function abort(action, err)
 	os.exit(1)
 end
 
-local function compilechunk()
-	local fn, err = load(chunk, "luar")
-	if fn then return fn end
-	abort("parsing", err)
+local function check(success, ...)
+	local result = {...}
+	if success then return result end
+	abort("executing", result[1])
 end
 
-local function call(fn)
-	local check = function(success, ...)
-		local result = {...}
-		if success then return result end
-		abort("executing", result[1])
-	end
+local fn, err = load(chunk, "luar")
+if not fn then abort("parsing", err) end
 
-	return check(pcall(fn))
-end
-
-local fn = compilechunk()
-local result = call(fn)
+local result = check(pcall(fn))
 
 if #result > 0 then
 	print("echo " .. table.concat(result, "\t"))
