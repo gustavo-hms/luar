@@ -39,7 +39,7 @@ local function compile(chunk)
 	if fn then return fn end
 
 	err = err:match('%[string "luar"%]:(.+)')
-	local message = "error while parsing lua block:\n\nlua %%{%s}\n\nLine %s\n"
+	local message = "error while parsing lua block:\n\nlua %%{%s}\n\nline %s\n"
 	debug(message:format(chunk, err))
 	os.exit(1)
 end
@@ -58,8 +58,22 @@ for i, v in ipairs(arg) do
 	end
 end
 
+local function try(fn)
+	local check = function(success, ...)
+		local result = {...}
+		if success then return result end
+
+		local err = result[1]:match('%[string "luar"%]:(.+)')
+		local message = "error on execution of lua block:\n\nlua %%{%s}\n\nline %s\n"
+		debug(message:format(lambda, err))
+		os.exit(1)
+	end
+
+	return check(pcall(fn))
+end
+
 local fn = compile(lambda)
-local result = { fn() }
+local result = try(fn)
 
 if #result > 0 then
 	print("echo " .. table.concat(result, "\t"))
