@@ -3,7 +3,7 @@ declare-option -hidden str luar_path %sh{ dirname $kak_source }
 define-command lua -params 1.. -docstring %{
     lua [<switches>] [args...] code: Execute provided Lua code as an anonymous function whose arguments are the args list.
     Switches:
-        -debug Instead of executing Kakoune commands inside Lua code, print them to *debug* buffer.
+        -debug Print Kakoune commands to *debug* buffer instead of executing them.
 } %{ eval %sh{
     lua $kak_opt_luar_path/luar.lua "$kak_quoted_$@"
 }}
