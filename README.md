@@ -1,6 +1,6 @@
 # Luar
 
-Luar is a minimalist plugin to execute [Lua](https://www.lua.org/) code from within [Kakoune](http://kakoune.org/). It's not designed to expose Kakoune's internals like [Vis](https://github.com/martanne/vis) or [Neovim](https://neovim.io/) do. Instead, it's conceived with Kakoune's extension model in mind. It does so by defining a sole command (`lua`) which can execute whathever string is passed to it in an external `lua` interpreter. By doing so, it can act as a complement for the `%sh{}` expansion when you need to run some logic inside Kakoune.
+Luar is a minimalist plugin to execute [Lua](https://www.lua.org/) code from within [Kakoune](http://kakoune.org/). It's not designed to expose Kakoune's internals like [Vis](https://github.com/martanne/vis) or [Neovim](https://neovim.io/) do. Instead, it's conceived with Kakoune's extension model in mind. It does so by defining a sole command (`lua`) which can execute whatever string is passed to it in an external `lua` interpreter. By doing so, it can act as a complement for the `%sh{}` expansion when you need to run some logic inside Kakoune.
 
 ## Usage
 
@@ -50,6 +50,25 @@ lua %{
 }
 ```
 As you can see, hyphens are replaced by underscores in command names.
+
+## External modules
+
+Since Lua modules are just plain tables and `require` is just a simple function, you can import modules everywhere in your program, not just at the beginning of a file. In particular, you can import external modules inside the `:lua` command. For instance, if you need to parse the contents of a file, you can use the elegant [LPeg](http://www.inf.puc-rio.br/~roberto/lpeg/) library:
+
+```lua
+lua %val{buffile} %{
+    local lpeg = require "lpeg"
+    
+    local function parse(file)
+        -- do the lpeg's magic here
+    end
+    
+    local tree = parse(arg[1])
+    -- ...
+}
+```
+
+You can also use this functionality to split your plugin into separate modules and use `:lua` to glue them together.
 
 ## Some examples
 The following examples are for didactic purposes. There are other ways to achieve the same results.
