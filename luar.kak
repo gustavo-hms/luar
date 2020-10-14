@@ -5,7 +5,7 @@ define-command lua -params 1.. -docstring %{
     Switches:
         -debug Print Kakoune commands to *debug* buffer instead of executing them.
 } %{ eval %sh{
-    lua $kak_opt_luar_path/luar.lua "$@"
+    lua "$kak_opt_luar_path/luar.lua" "$@"
 }}
 
 require-module kak
