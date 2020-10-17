@@ -1,10 +1,16 @@
 # Luar
 
-Luar is a minimalist plugin to execute [Lua](https://www.lua.org/) code from within [Kakoune](http://kakoune.org/). It's not designed to expose Kakoune's internals like [Vis](https://github.com/martanne/vis) or [Neovim](https://neovim.io/) do. Instead, it's conceived with Kakoune's extension model in mind. It does so by defining a sole command (`lua`) which can execute whatever string is passed to it in an external `lua` interpreter. By doing so, it can act as a complement for the `%sh{}` expansion when you need to run some logic inside Kakoune.
+Luar is a minimalist plugin to script [Kakoune](http://kakoune.org/) using [Lua](https://www.lua.org/). It's not designed to expose Kakoune's internals like [Vis](https://github.com/martanne/vis) or [Neovim](https://neovim.io/) do. Instead, it's conceived with Kakoune's extension model in mind. It does so by defining a sole command (`lua`) which can execute whatever string is passed to it in an external `lua` interpreter. By doing so, it can act as a complement for the `%sh{}` expansion when you need to run some logic inside Kakoune.
 
 ## Usage
 
-The `lua` command executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function. So, the following code:
+First of all, require the provided module:
+
+```kak
+require-module luar
+```
+
+The `luar` module exports a `lua` command, which executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function. So, the following code:
 
 ```lua
 lua %{
@@ -75,7 +81,7 @@ The following examples are for didactic purposes. There are other ways to achiev
 
 Suppose you want to execute `ctags-update-tags` whenever you write to a file, but only if there's already a `tags` file in the current directory. Using `:lua` you can write the following lines to your `kakrc`:
 
-```kak
+```lua
 hook global BufWritePost .* %{ lua %{
     if io.open "tags" then kak.ctags_update_tags() end
 }}
@@ -83,7 +89,7 @@ hook global BufWritePost .* %{ lua %{
 
 Now suppose you want to define a mapping to toggle the highlight of search patterns in the current window when you press `F2`. To achieve that, you can do something like this:
 
-```kak
+```lua
 declare-option -hidden bool highlight_search_on false
 
 define-command highlight-search-toggle %{ lua %opt{highlight_search_on} %{
@@ -103,8 +109,10 @@ map global normal <F2> ': highlight-search-toggle<ret>'
 
 ## Installation
 
-You must have a `lua` interpreter installed on your system. Then you can add the following line to your `kakrc` (supposing you use [plug.kak](https://github.com/andreyorst/plug.kak)):
+You must have a `lua` interpreter installed on your system. Then you can add the following line to your `kakrc` (supposing you use [plug.kak](https://github.com/robertmeta/plug.kak)):
 
 ```kak
-plug "gustavo-hms/luar"
+plug "gustavo-hms/luar" %{
+    require-module luar
+}
 ```
