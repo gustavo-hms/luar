@@ -2,10 +2,10 @@ local function debug(text)
 	local first = true
 	for line in text:gmatch('[^\n]*') do
 		if first then
-			print(string.format([[echo -debug %%@lua: %s@]], line))
+			print(string.format([[echo -debug %%☾lua: %s☾]], line))
 			first = false
 		else
-			print(string.format([[echo -debug %%@    %s@]], line))
+			print(string.format([[echo -debug %%☾    %s☾]], line))
 		end
 	end
 end
@@ -31,7 +31,7 @@ kak = setmetatable({}, {
 			local words = { name }
 
 			for _, v in ipairs {...} do
-				words[#words + 1] = string.format("'%s'", v)
+				words[#words + 1] = string.format("%%☾%s☾", v)
 			end
 
 			write(table.concat(words, " "))
