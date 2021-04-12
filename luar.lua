@@ -2,10 +2,10 @@ local function debug(text)
 	local first = true
 	for line in text:gmatch('[^\n]*') do
 		if first then
-			print(string.format([[echo -debug %%☾lua: %s☾]], line))
+			print(string.format([[echo -debug %%{lua: %s}]], line))
 			first = false
 		else
-			print(string.format([[echo -debug %%☾    %s☾]], line))
+			print(string.format([[echo -debug %%{    %s}]], line))
 		end
 	end
 end
