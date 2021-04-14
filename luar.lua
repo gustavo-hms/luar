@@ -66,6 +66,9 @@ if not results[1] then abort("executing", chunk, results[2]) end
 
 if #results > 1 then
 	table.remove(results, 1)
+	-- Allow returning either many values or a single table
+	if type(results[1]) == "table" then results = results[1] end
+
 	local command = string.format([[
 		evaluate-commands -save-regs dquote %%{
         	set-register dquote %s
