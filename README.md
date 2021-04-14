@@ -10,14 +10,33 @@ First of all, require the provided module:
 require-module luar
 ```
 
-The `luar` module exports a `lua` command, which executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function. So, the following code:
+The `luar` module exports a `lua` command, which executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function, and whatever this anonymous function returns replaces the current selections. So, the following code:
 
 ```lua
 lua %{
     return "Olá!"
 }
 ```
-echoes `Olá!` in the status line.
+replaces your selections with `Olá!`.
+
+In the same vein, if you have, say, three selections, the code:
+
+```lua
+lua %{
+    return 17, 19, 23
+}
+```
+
+replaces each selection with `17`, `19` and `23` respectivelly. The same can be achieved by returning a single table with three elements:
+
+
+```lua
+lua %{
+    return {17, 19, 23}
+}
+```
+
+The two forms are equivalent.
 
 This anonymous function can take arguments by passing values before the `%{}` block:
 
@@ -82,9 +101,11 @@ The following examples are for didactic purposes. There are other ways to achiev
 Suppose you want to execute `ctags-update-tags` whenever you write to a file, but only if there's already a `tags` file in the current directory. Using `:lua` you can write the following lines to your `kakrc`:
 
 ```lua
-hook global BufWritePost .* %{ lua %{
-    if io.open "tags" then kak.ctags_update_tags() end
-}}
+hook global BufWritePost .* %{
+    lua %{
+        if io.open("tags") then kak.ctags_update_tags() end
+    }
+}
 ```
 
 Now suppose you want to define a mapping to toggle the highlight of search patterns in the current window when you press `F2`. To achieve that, you can do something like this:
@@ -92,17 +113,19 @@ Now suppose you want to define a mapping to toggle the highlight of search patte
 ```lua
 declare-option -hidden bool highlight_search_on false
 
-define-command highlight-search-toggle %{ lua %opt{highlight_search_on} %{
-    local is_on = args()
+define-command highlight-search-toggle %{
+    lua %opt{highlight_search_on} %{
+        local is_on = args()
 
-    if is_on then
-        kak.remove_highlighter "window/highlight-search"
-    else
-        kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
-    end
+        if is_on then
+            kak.remove_highlighter("window/highlight-search")
+        else
+            kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
+        end
 
-    kak.set_option("window", "highlight_search_on", not is_on)
-}}
+        kak.set_option("window", "highlight_search_on", not is_on)
+    }
+}
 
 map global normal <F2> ': highlight-search-toggle<ret>'
 ```

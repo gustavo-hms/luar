@@ -16,7 +16,8 @@ require-module luar
 
 The `luar` module exports a `lua` command, which executes the code
 passed to it in an external `lua` interpreter. The code is interpreted
-as the body of an anonymous function. So, the following code:
+as the body of an anonymous function, and whatever this anonymous function
+returns replaces the current selections. So, the following code:
 
 [source,lua]
 ----
@@ -25,7 +26,28 @@ lua %{
 }
 ----
 
-echoes `Olá!` in the status line.
+replaces your selections with `Olá!`.
+
+In the same vein, if you have, say, three selections, the code:
+
+[source,lua]
+----
+lua %{
+    return 17, 19, 23
+}
+----
+
+replaces each selection with `17`, `19` and `23` respectivelly. The same can be
+achieved by returning a single table with three elements:
+
+[source,lua]
+----
+lua %{
+    return {17, 19, 23}
+}
+----
+
+The two forms are equivalent.
 
 This anonymous function can take arguments by passing values before the
 `%{}` block:
@@ -37,7 +59,7 @@ lua 17 19 %{
 }
 ----
 
-The above code will echo `36` in the status line. As you can see, the
+The above code will replace your selections with `36`. As you can see, the
 arguments can be accessed with the `arg` table.
 
 As a convenience, you can use the provided `args` function to name your
@@ -52,8 +74,8 @@ lua 17 19 %{
 ----
 
 [[expansions]]
-Since Kakoune does not process <<expansions, expansions>> inside these `lua %{}` blocks,
-you need to pass expansions as arguments if you need to inspect
+Since Kakoune does not process <<expansions, expansions>> inside these `lua %{}`
+blocks, you need to pass expansions as arguments if you need to inspect
 Kakoune’s state:
 
 [source,lua]
@@ -111,9 +133,11 @@ directory. Using `:lua` you can write the following lines to your
 
 [source,lua]
 ----
-hook global BufWritePost .* %{ lua %{
-    if io.open "tags" then kak.ctags_update_tags() end
-}}
+hook global BufWritePost .* %{
+    lua %{
+        if io.open("tags") then kak.ctags_update_tags() end
+    }
+}
 ----
 
 Now suppose you want to define a mapping to toggle the highlight of
@@ -124,17 +148,19 @@ that, you can do something like this:
 ----
 declare-option -hidden bool highlight_search_on false
 
-define-command highlight-search-toggle %{ lua %opt{highlight_search_on} %{
-    local is_on = args()
-
-    if is_on then
-        kak.remove_highlighter "window/highlight-search"
-    else
-        kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
-    end
-
-    kak.set_option("window", "highlight_search_on", not is_on)
-}}
+define-command highlight-search-toggle %{
+    lua %opt{highlight_search_on} %{
+        local is_on = args()
+    
+        if is_on then
+            kak.remove_highlighter("window/highlight-search")
+        else
+            kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
+        end
+    
+        kak.set_option("window", "highlight_search_on", not is_on)
+    }
+}
 
 map global normal <F2> ': highlight-search-toggle<ret>'
 ----
