@@ -46,7 +46,7 @@ lua 17 19 %{
 }
 ```
 
-The above code will echo `36` in the status line. As you can see, the arguments can be accessed with the `arg` table.
+The above code will remplace all the selections with `36`. As you can see, the arguments can be accessed with the `arg` table.
 
 As a convenience, you can use the provided `args` function to name your arguments:
 
