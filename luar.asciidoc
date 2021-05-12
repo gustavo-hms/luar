@@ -49,7 +49,18 @@ lua %{
 
 The two forms are equivalent.
 
-This anonymous function can take arguments by passing values before the
+If, on the other hand, you return nothing, the content of the selections won't
+be modified:
+
+----
+lua %{
+    if true then
+        return
+    end
+}
+----
+
+The anonymous function can take arguments by passing values before the
 `%{}` block:
 
 [source,lua]
@@ -59,7 +70,7 @@ lua 17 19 %{
 }
 ----
 
-The above code will replace your selections with `36`. As you can see, the
+The above code will replace all the selections with `36`. As you can see, the
 arguments can be accessed with the `arg` table.
 
 As a convenience, you can use the provided `args` function to name your
