@@ -1,6 +1,6 @@
 declare-option -hidden str luar_path %sh{ dirname $kak_source }
 
-declare-option str luar_interpreter lua
+declare-option -docstring "The executable used to run any provided Lua code" str luar_interpreter lua
 
 provide-module luar %#
     define-command lua -params 1.. -docstring %{
