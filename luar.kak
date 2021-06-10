@@ -1,12 +1,14 @@
 declare-option -hidden str luar_path %sh{ dirname $kak_source }
 
+declare-option str luar_interpreter lua
+
 provide-module luar %#
     define-command lua -params 1.. -docstring %{
         lua [<switches>] [args...] code: Execute provided Lua code as an anonymous function whose arguments are the args list.
         Switches:
             -debug Print Kakoune commands to *debug* buffer instead of executing them.
     } %{ eval %sh{
-        lua "$kak_opt_luar_path/luar.lua" "$@"
+        $kak_opt_luar_interpreter "$kak_opt_luar_path/luar.lua" "$@"
     }}
 
     require-module kak
