@@ -93,11 +93,11 @@ Since Lua modules are just plain tables and `require` is just a simple function,
 ```lua
 lua %val{buffile} %{
     local lpeg = require "lpeg"
-    
+
     local function parse(file)
         -- do the lpeg's magic here
     end
-    
+
     local tree = parse(arg[1])
     -- ...
 }
@@ -150,4 +150,13 @@ You must have a `lua` interpreter installed on your system. Then you can add the
 plug "gustavo-hms/luar" %{
     require-module luar
 }
+```
+
+## Configuration
+
+You can also change the Lua interpreter used by this plugin by changing the `luar_interpreter` option, e.g.:
+
+```kak
+# use luajit to run all Lua snippets
+set-option global luar_interpreter luajit
 ```

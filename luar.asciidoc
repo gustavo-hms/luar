@@ -122,11 +122,11 @@ contents of a file, you can use the elegant LPeg library:
 ----
 lua %val{buffile} %{
     local lpeg = require "lpeg"
-    
+
     local function parse(file)
         -- do the lpeg's magic here
     end
-    
+
     local tree = parse(arg[1])
     -- ...
 }
@@ -134,6 +134,17 @@ lua %val{buffile} %{
 
 You can also use this functionality to split your plugin into separate
 modules and use `:lua` to glue them together.
+
+== Configuration
+
+You can also change the Lua interpreter used by this plugin by changing the
+`luar_interpreter` option, e.g.:
+
+[source,kak]
+----
+# use luajit to run all Lua snippets
+set-option global luar_interpreter luajit
+----
 
 == Some examples
 
@@ -162,13 +173,13 @@ declare-option -hidden bool highlight_search_on false
 define-command highlight-search-toggle %{
     lua %opt{highlight_search_on} %{
         local is_on = args()
-    
+
         if is_on then
             kak.remove_highlighter("window/highlight-search")
         else
             kak.add_highlighter("window/highlight-search", "dynregex", "%reg{/}", "0:default,+ub")
         end
-    
+
         kak.set_option("window", "highlight_search_on", not is_on)
     }
 }
