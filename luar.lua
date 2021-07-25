@@ -32,7 +32,10 @@ local function quote(words)
 	return table.concat(words, " ")
 end
 
-args = function() return table.unpack(arg) end
+args = function()
+	local unpack = unpack or table.unpack
+    return unpack(arg)
+end
 
 kak = setmetatable({}, {
 	__index = function(t, command)
