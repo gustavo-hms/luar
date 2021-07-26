@@ -11,7 +11,7 @@ local function debug(text)
 end
 
 local function abort(action, chunk, err)
-	err = err:match('%[string "luar"%]:(.+)')
+	err = err:match('%[string "luar"%]:(.+)') or err
 	local message = "error while %s lua block:\n\nlua %%{%s}\n\nline %s\n"
 	debug(message:format(action, chunk, err))
 	os.exit(1)
