@@ -37,6 +37,10 @@ args = function()
     return unpack(arg)
 end
 
+addpackagepath = function(path)
+	package.path = string.format("%s/?.lua;%s", path, package.path)
+end
+
 kak = setmetatable({}, {
 	__index = function(t, command)
 		local name = command:gsub("_", "-")

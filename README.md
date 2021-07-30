@@ -103,7 +103,24 @@ lua %val{buffile} %{
 }
 ```
 
-You can also use this functionality to split your plugin into separate modules and use `:lua` to glue them together.
+You can also use this functionality to split your plugin into separate modules
+and use `:lua` to glue them together. To make that easier, `luar` provides the
+`addpackagepath` convenience function. It configures the lua interpreter to
+search for lua modules in the provided directory. It's meant to be used like
+this:
+
+```kak
+declare-option -hidden str my_plugin_path %sh{ dirname $kak_source }
+
+define-command my-command %{
+    lua %opt{my_plugin_path} %{
+        addpackagepath(arg[1])
+        local module = require "my_local_module"
+        -- ...
+    }
+}
+```
+
 
 ## Some examples
 The following examples are for didactic purposes. There are other ways to achieve the same results.

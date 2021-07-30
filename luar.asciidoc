@@ -9,7 +9,6 @@ an external `lua` interpreter. This way, it can act as a complement for the
 
 First of all, require the provided module:
 
-[source,kak]
 ----
 require-module luar
 ----
@@ -19,7 +18,6 @@ passed to it in an external `lua` interpreter. The code is interpreted
 as the body of an anonymous function, and whatever this anonymous function
 returns replaces the current selections. So, the following code:
 
-[source,lua]
 ----
 lua %{
     return "Olá!"
@@ -30,7 +28,6 @@ replaces your selections with `Olá!`.
 
 In the same vein, if you have, say, three selections, the code:
 
-[source,lua]
 ----
 lua %{
     return 17, 19, 23
@@ -40,7 +37,6 @@ lua %{
 replaces each selection with `17`, `19` and `23` respectivelly. The same can be
 achieved by returning a single table with three elements:
 
-[source,lua]
 ----
 lua %{
     return {17, 19, 23}
@@ -63,7 +59,6 @@ lua %{
 The anonymous function can take arguments by passing values before the
 `%{}` block:
 
-[source,lua]
 ----
 lua 17 19 %{
     return arg[1] + arg[2]
@@ -76,7 +71,6 @@ arguments can be accessed with the `arg` table.
 As a convenience, you can use the provided `args` function to name your
 arguments:
 
-[source,lua]
 ----
 lua 17 19 %{
     local first, second = args()
@@ -89,7 +83,6 @@ Since Kakoune does not process <<expansions, expansions>> inside these `lua %{}`
 blocks, you need to pass expansions as arguments if you need to inspect
 Kakoune’s state:
 
-[source,lua]
 ----
 lua %val{client} %{
     local client = args()
@@ -100,7 +93,6 @@ lua %val{client} %{
 Finally, you can run all commands defined in Kakoune (including third
 party ones) from `lua` code using the provided `kak` module:
 
-[source,lua]
 ----
 lua %{
     kak.set_register("/", "Search this!")
@@ -118,7 +110,6 @@ the beginning of a file. In particular, you can import external modules
 inside the `:lua` command. For instance, if you need to parse the
 contents of a file, you can use the elegant LPeg library:
 
-[source,lua]
 ----
 lua %val{buffile} %{
     local lpeg = require "lpeg"
@@ -132,15 +123,29 @@ lua %val{buffile} %{
 }
 ----
 
-You can also use this functionality to split your plugin into separate
-modules and use `:lua` to glue them together.
+You can also use this functionality to split your plugin into separate modules
+and use `:lua` to glue them together. To make that easier, `luar` provides the
+`addpackagepath` convenience function. It configures the lua interpreter to
+search for lua modules in the provided directory. It's meant to be used like
+this:
+
+----
+declare-option -hidden str my_plugin_path %sh{ dirname $kak_source }
+
+define-command my-command %{
+    lua %opt{my_plugin_path} %{
+        addpackagepath(arg[1])
+        local module = require "my_local_module"
+        -- ...
+    }
+}
+----
 
 == Configuration
 
 You can also change the Lua interpreter used by this plugin by changing the
 `luar_interpreter` option, e.g.:
 
-[source,kak]
 ----
 # use luajit to run all Lua snippets
 set-option global luar_interpreter luajit
@@ -153,7 +158,6 @@ file, but only if there’s already a `tags` file in the current
 directory. Using `:lua` you can write the following lines to your
 `kakrc`:
 
-[source,lua]
 ----
 hook global BufWritePost .* %{
     lua %{
@@ -166,7 +170,6 @@ Now suppose you want to define a mapping to toggle the highlight of
 search patterns in the current window when you press `F2`. To achieve
 that, you can do something like this:
 
-[source,lua]
 ----
 declare-option -hidden bool highlight_search_on false
 
