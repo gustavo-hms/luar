@@ -14,8 +14,9 @@ provide-module luar %#
     require-module kak
     require-module lua
 
-    add-highlighter shared/kakrc/lua1 region -recurse '\{' '(^|\h)\K%?lua([\s{}\w%/$-|''"])* %\{' '\}' ref lua
-    add-highlighter shared/kakrc/lua2 region -recurse '\(' '(^|\h)\K%?lua([\s{}\w%/$-|''"])* %\(' '\)' ref lua
-    add-highlighter shared/kakrc/lua3 region -recurse '\[' '(^|\h)\K%?lua([\s{}\w%/$-|''"])* %\[' '\]' ref lua
-    add-highlighter shared/kakrc/lua4 region -recurse '<' '(^|\h)\K%?lua([\s{}\w%/$-|''"])* %<' '>' ref lua
+    add-highlighter shared/kakrc/code/lua regex (?:\s|\A)\Klua(?:(?=\s)|\z) 0:keyword
+    add-highlighter shared/kakrc/lua1 region -recurse '\{' '(^|\h)lua([\s{}\w%/$-|''"])* %\{\K' '\}' ref lua
+    add-highlighter shared/kakrc/lua2 region -recurse '\(' '(^|\h)lua([\s{}\w%/$-|''"])* %\(\K' '\)' ref lua
+    add-highlighter shared/kakrc/lua3 region -recurse '\[' '(^|\h)lua([\s{}\w%/$-|''"])* %\[\K' '\]' ref lua
+    add-highlighter shared/kakrc/lua4 region -recurse '<' '(^|\h)lua([\s{}\w%/$-|''"])* %<\K' '>' ref lua
 #
