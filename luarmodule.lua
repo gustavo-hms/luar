@@ -3,20 +3,12 @@ local function debug(text)
 
     for line in text:gmatch('[^\n]*') do
         if first then
-            print(string.format([[echo -debug %%{lua: %s}]], line))
+            print(string.format([[echo -debug %%{luar: %s}]], line))
             first = false
         else
             print(string.format([[echo -debug %%{    %s}]], line))
         end
     end
-end
-
-local function abort(action, chunk, err)
-    err = err:match('%[string "luar"%]:(.+)') or err
-    local message = "error while %s lua block:\n\nlua %%{%s}\n\nline %s\n"
-    debug(message:format(action, chunk, err))
-    kak.fail("'lua': check *debug* buffer")
-    os.exit(1)
 end
 
 local function quote(words)
@@ -77,9 +69,30 @@ local function parseargs()
     return chunk
 end
 
+local function execute(fn, abort)
+    local chunk = parseargs()
+    local results = { pcall(fn, chunk) }
+    if not results[1] then abort("executing", chunk, results[2]) end
+
+    if #results > 1 then
+        table.remove(results, 1)
+        -- Allow returning either many values or a single table
+        if type(results[1]) == "table" then results = results[1] end
+
+        local command = string.format([[
+            evaluate-commands -save-regs dquote %%{
+                set-register dquote %s
+                execute-keys R
+            }
+        ]], quote(results))
+        print(command)
+    end
+end
+
 return {
     args           = args,
     addpackagepath = addpackagepath,
     kak            = kak,
-    parseargs      = parseargs,
+    execute        = execute,
+    debug          = debug,
 }
