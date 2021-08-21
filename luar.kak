@@ -11,6 +11,14 @@ provide-module luar %#
         $kak_opt_luar_interpreter "$kak_opt_luar_path/luar.lua" "$@"
     }}
 
+    define-command fennel -params 1.. -docstring %{
+        fennel [<switches>] [args...] code: Execute provided Fennel code as an anonymous function whose arguments are the args list.
+        Switches:
+            -debug Print Kakoune commands to *debug* buffer instead of executing them.
+    } %{ eval %sh{
+        fennel "$kak_opt_luar_path/luar.fnl" "$@"
+    }}
+
     require-module kak
     require-module lua
 
