@@ -3,10 +3,10 @@ local function debug(text)
 
     for line in text:gmatch('[^\n]*') do
         if first then
-            print(string.format([[echo -debug %%{luar: %s}]], line))
+            print(string.format([[echo -debug %%☽luar: %s☽]], line))
             first = false
         else
-            print(string.format([[echo -debug %%{    %s}]], line))
+            print(string.format([[echo -debug %%☽    %s☽]], line))
         end
     end
 end

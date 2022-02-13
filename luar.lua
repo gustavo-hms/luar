@@ -4,7 +4,7 @@ args, kak, addpackagepath = luar.args, luar.kak, luar.addpackagepath
 
 local function abort(action, chunk, err)
 	err = err:match('%[string "luar"%]:(.+)') or err
-	local message = "error while %s lua block:\n\nlua %%{%s}\n\nlua:%s\n"
+	local message = "error while %s lua block:\n%s\nlua:%s\n"
 	luar.debug(message:format(action, chunk, err))
 	luar.kak.fail("'lua' check *debug* buffer")
 	os.exit(1)
