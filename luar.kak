@@ -1,4 +1,4 @@
-declare-option -hidden str luar_path %sh{ dirname $kak_source }
+declare-option -hidden str luar_path %sh{ dirname "$kak_source" }
 
 declare-option -docstring "The Lua interpreter used to execute Lua code" str luar_interpreter lua
 
@@ -9,8 +9,7 @@ provide-module luar %#
             -debug Print Kakoune commands to *debug* buffer instead of executing them.
     } %{
         evaluate-commands %sh{
-            export LUA_PATH="$kak_opt_luar_path/?.lua;$LUA_PATH"
-            $kak_opt_luar_interpreter "$kak_opt_luar_path/luar.lua" "$@"
+            exec "$kak_opt_luar_interpreter" "$kak_opt_luar_path/luar.lua" "$@"
         }
     }
 
@@ -20,8 +19,7 @@ provide-module luar %#
             -debug Print Kakoune commands to *debug* buffer instead of executing them.
     } %{
         evaluate-commands %sh{
-            export LUA_PATH="$kak_opt_luar_path/?.lua;$LUA_PATH"
-            fennel "$kak_opt_luar_path/luar.fnl" "$@"
+            exec fennel "$kak_opt_luar_path/luar.fnl" "$@"
         }
     }
 

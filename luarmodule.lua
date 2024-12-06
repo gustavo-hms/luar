@@ -3,10 +3,10 @@ local function debug(text)
 
     for line in text:gmatch('[^\n]*') do
         if first then
-            print(string.format([[echo -debug %%{luar: %s}]], line))
+            print(string.format([[echo -debug %%☽lua: %s☽]], line))
             first = false
         else
-            print(string.format([[echo -debug %%{    %s}]], line))
+            print(string.format([[echo -debug %%☽    %s☽]], line))
         end
     end
 end
@@ -34,7 +34,7 @@ local kak = setmetatable({}, {
     __index = function(t, command)
         local name = command:gsub("_", "-")
         t[command] = function(...)
-            write(name .. " " .. quote {...})
+            write(name .. " " .. quote { ... })
         end
 
         return t[command]
@@ -50,13 +50,10 @@ local function parseargs()
         if v == "-debug" then
             write = debug
             debug_flag = i
-
         elseif v == "true" then
             arg[i] = true
-
         elseif v == "false" then
             arg[i] = false
-
         else
             arg[i] = tonumber(v) or v
         end
