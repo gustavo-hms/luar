@@ -1,6 +1,15 @@
 # Luar
 
-Luar is a minimalist plugin to script [Kakoune](http://kakoune.org/) using [Lua](https://www.lua.org/). It's not designed to expose Kakoune's internals like [Vis](https://github.com/martanne/vis) or [Neovim](https://neovim.io/) do. Instead, it's conceived with Kakoune's extension model in mind. It does so by defining a sole command (`lua`) which can execute whatever string is passed to it in an external `lua` interpreter. By doing so, it can act as a complement for the `%sh{}` expansion when you need to run some logic inside Kakoune.
+Luar is a minimalist plugin to script [Kakoune](http://kakoune.org/) using
+either [Lua](https://www.lua.org/) or [Fennel](https://fennel-lang.org/). It's
+not designed to expose Kakoune's internals like
+[Vis](https://github.com/martanne/vis) or [Neovim](https://neovim.io/) do.
+Instead, it's conceived with Kakoune's extension model in mind. It does so by
+defining a sole `lua` command which can execute whatever string is passed to it
+in an external `lua` interpreter, and an equivalent `fennel` command which
+executes whatever string is passed to it in an external `fennel` interpreter. By
+doing so, it can act as a complement for the `%sh{}` expansion when you need to
+run some logic inside Kakoune.
 
 ## Usage
 
@@ -10,7 +19,13 @@ First of all, require the provided module:
 require-module luar
 ```
 
-The `luar` module exports a `lua` command, which executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function, and whatever this anonymous function returns replaces the current selections. So, the following code:
+The `luar` module exports a `lua` command, which executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function, and whatever this anonymous function returns replaces the current selections.
+
+The module also exposes a `fennel` command with the same semantics. See section
+[Executing fennel code](https://github.com/gustavo-hms/luar#executing-fennel-
+code) for some examples.
+
+So, the following code:
 
 ```lua
 lua %{
@@ -72,19 +87,60 @@ Since Kakoune does not process expansions inside these `lua %{}` blocks, you nee
 ```lua
 lua %val{client} %{
     local client = args()
-    return string.format("I'm client “%s”", client)
+    kak.echo(string.format("I'm client “%s”", client))
 }
 ```
 
 Finally, you can run all commands defined in Kakoune (including third party ones) from `lua` code using the provided `kak` module:
 
-```lua
+```kak
+define-command custom-echo -params 1.. %{
+    echo %arg{@}
+}
+
 lua %{
     kak.set_register("/", "Search this!")
     kak.execute_keys('%s<ret>cSearch that!<esc>')
+    kak.custom_echo("Text selected!")
 }
 ```
 As you can see, hyphens are replaced by underscores in command names.
+
+## Executing fennel code
+
+Anything you can do with the `lua` command you can do with the equivalent `fennel` command. So, to replace your selections with the string `"Olá!"`:
+```fennel
+fennel %("Olá!")
+```
+Or, to replace three selections with some numbers:
+```fennel
+fennel %{
+  (values 17 19 23)
+}
+```
+
+Expansions work the same way:
+
+```fennel
+fennel %val{client} %{
+  (let [client (args)]
+    (kak.echo (string.format "I'm client “%s”" client)))
+}
+```
+
+The only difference is that you don't need to replace hyphens with underscores in command names:
+
+```kak
+define-command custom-echo -params 1.. %{
+    echo %arg{@}
+}
+
+fennel %{
+    (kak.set-register "/" "Search this!")
+    (kak.execute-keys "%s<ret>cSearch that!<esc>")
+    (kak.custom-echo "Text selected!")
+}
+```
 
 ## External modules
 
