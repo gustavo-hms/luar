@@ -1,7 +1,7 @@
 local function debug(text)
     local first = true
 
-    for line in text:gmatch('[^\n]*') do
+    for line in text:gmatch('([^\n]*)\n') do
         if first then
             print(string.format([[echo -debug %%☽lua: %s☽]], line))
             first = false
