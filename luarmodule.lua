@@ -3,7 +3,7 @@ local function debug(text)
 
     for line in text:gmatch('([^\n]*)\n') do
         if first then
-            print(string.format([[echo -debug %%☽lua: %s☽]], line))
+            print(string.format([[echo -debug %%☽luar: %s☽]], line))
             first = false
         else
             print(string.format([[echo -debug %%☽    %s☽]], line))
