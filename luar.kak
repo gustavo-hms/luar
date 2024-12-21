@@ -21,7 +21,12 @@ provide-module luar %#
     } %{
         evaluate-commands %sh{
             export LUA_PATH="$kak_opt_luar_path/?.lua;$LUA_PATH"
-            exec fennel "$kak_opt_luar_path/luar.fnl" "$@"
+
+            if [ $kak_opt_luar_interpreter != "lua" ]; then
+                exec fennel --lua "$kak_opt_luar_interpreter" "$kak_opt_luar_path/luar.fnl" "$@"
+            else
+                exec fennel "$kak_opt_luar_path/luar.fnl" "$@"
+            fi
         }
     }
 
