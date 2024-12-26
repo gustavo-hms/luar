@@ -31,8 +31,7 @@ lua %{
 replaces your selections with `Olá!`.
 
 The module also exposes a `fennel` command with the same semantics. See section
-[Executing fennel code](https://github.com/gustavo-hms/luar#executing-fennel-
-code) for some examples.
+[Executing fennel code](https://github.com/gustavo-hms/luar#executing-fennel-code) for some examples.
 
 In the same vein, if you have, say, three selections, the code:
 
