@@ -1,6 +1,13 @@
 local function debug(text)
     local first = true
 
+    if not text:find("\n") then
+        -- We need to insert a newline here to be able to use pattern bellow
+        -- instead of just using `[^\n]*`. The later pattern can't be use because
+        -- otherwise luajit would insert random newlines at the end of the match.
+        text = text .. "\n"
+    end
+
     for line in text:gmatch('([^\n]*)\n') do
         if first then
             print(string.format([[echo -debug %%☽luar: %s☽]], line))
