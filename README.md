@@ -21,10 +21,6 @@ require-module luar
 
 The `luar` module exports a `lua` command, which executes the code passed to it in an external `lua` interpreter. The code is interpreted as the body of an anonymous function, and whatever this anonymous function returns replaces the current selections.
 
-The module also exposes a `fennel` command with the same semantics. See section
-[Executing fennel code](https://github.com/gustavo-hms/luar#executing-fennel-
-code) for some examples.
-
 So, the following code:
 
 ```lua
@@ -33,6 +29,10 @@ lua %{
 }
 ```
 replaces your selections with `Olá!`.
+
+The module also exposes a `fennel` command with the same semantics. See section
+[Executing fennel code](https://github.com/gustavo-hms/luar#executing-fennel-
+code) for some examples.
 
 In the same vein, if you have, say, three selections, the code:
 
@@ -101,10 +101,11 @@ define-command custom-echo -params 1.. %{
 lua %{
     kak.set_register("/", "Search this!")
     kak.execute_keys('%s<ret>cSearch that!<esc>')
+    -- Calling custom commands is also possible.
     kak.custom_echo("Text selected!")
 }
 ```
-As you can see, hyphens are replaced by underscores in command names.
+As you can see, hyphens are replaced by underscores in command names. Luar also takes care of quoting the arguments to avoid unexpected results.
 
 ## Executing fennel code
 
@@ -177,6 +178,24 @@ define-command my-command %{
 }
 ```
 
+## Debugging
+
+Passing the `-debug` flag, the `luar` command will print in the `*debug*` buffer all Kakoune commands it would otherwise execute. This way, you can see the exact commands your script would execute. For instance, running
+
+```kak
+lua -debug %val{client} %{
+    local keys = "%ssomethingcanything<ret>"
+    kak.execute_keys(keys)
+    kak.echo("Word something replaced by word anything on client " .. arg[1])
+    kak.write()
+}
+```
+would print the following text in the debug buffer:
+```
+luar: execute-keys %☾%ssomethingcanything<ret>☾
+luar: echo %☾Word something replaced by word anything on client client0☾
+luar: write
+```
 
 ## Some examples
 The following examples are for didactic purposes. There are other ways to achieve the same results.
