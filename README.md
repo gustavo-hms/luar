@@ -91,7 +91,9 @@ lua %val{client} %{
 }
 ```
 
-Finally, you can run all commands defined in Kakoune (including third party ones) from `lua` code using the provided `kak` module:
+## Calling commands
+
+You can run all commands defined in Kakoune (including third party ones) from `lua` code using the provided `kak` module:
 
 ```kak
 define-command custom-echo -params 1.. %{
