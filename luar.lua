@@ -6,7 +6,7 @@ local function abort(action, chunk, err)
     err = err:match('%[string "luar"%]:(.+)') or err
     local message = "error while %s lua block:\n\nlua %%{%s}\n\nlua:%s\n"
     luar.debug(message:format(action, chunk, err))
-    luar.kak.fail("'lua' check *debug* buffer")
+    print([[fail "'lua': check *debug* buffer"]])
     os.exit(1)
 end
 
