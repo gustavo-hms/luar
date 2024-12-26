@@ -1,11 +1,15 @@
-= Luar
+== Luar
 
-Luar is a minimalist plugin to script Kakoune using Lua. It does so by defining
-a sole command (`lua`) which can execute whatever string is passed to it in
-an external `lua` interpreter. This way, it can act as a complement for the
-`%sh{}` expansion when you need to run some logic inside Kakoune.
+Luar is a minimalist plugin to script Kakoune using either Lua or Fennel. It’s
+not designed to expose Kakoune’s internals like Vis or Neovim do. Instead, it’s
+conceived with Kakoune’s extension model in mind. It does so by defining a sole
+`lua` command which can execute whatever string is passed to it in an external
+`lua` interpreter, and an equivalent `fennel` command which executes whatever
+string is passed to it in an external `fennel` interpreter. By doing so, it can
+act as a complement for the `%sh{}` expansion when you need to run some logic
+inside Kakoune.
 
-== Usage
+=== Usage
 
 First of all, require the provided module:
 
@@ -15,8 +19,10 @@ require-module luar
 
 The `luar` module exports a `lua` command, which executes the code
 passed to it in an external `lua` interpreter. The code is interpreted
-as the body of an anonymous function, and whatever this anonymous function
-returns replaces the current selections. So, the following code:
+as the body of an anonymous function, and whatever this anonymous
+function returns replaces the current selections.
+
+So, the following code:
 
 ----
 lua %{
@@ -26,6 +32,9 @@ lua %{
 
 replaces your selections with `Olá!`.
 
+The module also exposes a `fennel` command with the same semantics. See section
+_Executing fennel code_ for some examples.
+
 In the same vein, if you have, say, three selections, the code:
 
 ----
@@ -34,8 +43,9 @@ lua %{
 }
 ----
 
-replaces each selection with `17`, `19` and `23` respectivelly. The same can be
-achieved by returning a single table with three elements:
+replaces each selection with `17`, `19` and `23` respectivelly.
+The same can be achieved by returning a single table with three
+elements:
 
 ----
 lua %{
@@ -45,8 +55,8 @@ lua %{
 
 The two forms are equivalent.
 
-If, on the other hand, you return nothing, the content of the selections won't
-be modified:
+If, on the other hand, you return nothing, the content of the selections
+won’t be modified:
 
 ----
 lua %{
@@ -65,11 +75,11 @@ lua 17 19 %{
 }
 ----
 
-The above code will replace all the selections with `36`. As you can see, the
-arguments can be accessed with the `arg` table.
+The above code will replace all the selections with `36`. As you can
+see, the arguments can be accessed with the `arg` table.
 
-As a convenience, you can use the provided `args` function to name your
-arguments:
+As a convenience, you can use the provided `args` function to name
+your arguments:
 
 ----
 lua 17 19 %{
@@ -78,15 +88,14 @@ lua 17 19 %{
 }
 ----
 
-[[expansions]]
-Since Kakoune does not process <<expansions, expansions>> inside these `lua %{}`
+Since Kakoune does not process expansions inside these `lua %{}`
 blocks, you need to pass expansions as arguments if you need to inspect
 Kakoune’s state:
 
 ----
 lua %val{client} %{
     local client = args()
-    return string.format("I'm client “%s”", client)
+    kak.echo(string.format("I'm client “%s”", client))
 }
 ----
 
@@ -94,21 +103,73 @@ Finally, you can run all commands defined in Kakoune (including third
 party ones) from `lua` code using the provided `kak` module:
 
 ----
+define-command custom-echo -params 1.. %{
+    echo %arg{@}
+}
+
 lua %{
     kak.set_register("/", "Search this!")
     kak.execute_keys('%s<ret>cSearch that!<esc>')
+    -- Calling custom commands is also possible.
+    kak.custom_echo("Text selected!")
 }
 ----
 
 As you can see, hyphens are replaced by underscores in command names.
+Luar also takes care of quoting the arguments to avoid unexpected
+results.
 
-== External modules
+=== Executing fennel code
+
+Anything you can do with the `lua` command you can do with the
+equivalent `fennel` command. So, to replace your selections with the
+string `"Olá!"`:
+
+----
+fennel %{
+    "Olá!"
+}
+----
+
+Or, to replace three selections with some numbers:
+
+----
+fennel %{
+  (values 17 19 23)
+}
+----
+
+Expansions work the same way:
+
+----
+fennel %val{client} %{
+  (let [client (args)]
+    (kak.echo (string.format "I'm client “%s”" client)))
+}
+----
+
+The only difference is that you don’t need to replace hyphens with
+underscores in command names:
+
+----
+define-command custom-echo -params 1.. %{
+    echo %arg{@}
+}
+
+fennel %{
+    (kak.set-register "/" "Search this!")
+    (kak.execute-keys "%s<ret>cSearch that!<esc>")
+    (kak.custom-echo "Text selected!")
+}
+----
+
+=== External modules
 
 Since Lua modules are just plain tables and `require` is just a simple
 function, you can import modules everywhere in your program, not just at
 the beginning of a file. In particular, you can import external modules
 inside the `:lua` command. For instance, if you need to parse the
-contents of a file, you can use the elegant LPeg library:
+contents of a file, you can use the elegant [LPeg] library:
 
 ----
 lua %val{buffile} %{
@@ -123,11 +184,11 @@ lua %val{buffile} %{
 }
 ----
 
-You can also use this functionality to split your plugin into separate modules
-and use `:lua` to glue them together. To make that easier, `luar` provides the
-`addpackagepath` convenience function. It configures the lua interpreter to
-search for lua modules in the provided directory. It's meant to be used like
-this:
+You can also use this functionality to split your plugin into separate
+modules and use `:lua` to glue them together. To make that easier,
+`luar` provides the `addpackagepath` convenience function. It
+configures the lua interpreter to search for lua modules in the provided
+directory. It’s meant to be used like this:
 
 ----
 declare-option -hidden str my_plugin_path %sh{ dirname $kak_source }
@@ -141,20 +202,37 @@ define-command my-command %{
 }
 ----
 
-== Configuration
+=== Debugging
 
-You can also change the Lua interpreter used by this plugin by changing the
-`luar_interpreter` option, e.g.:
+Passing the `-debug` flag, the `luar` command will print in the
+`*debug*` buffer all Kakoune commands it would otherwise execute. This
+way, you can see the exact commands your script would execute. For
+instance, running
 
 ----
-# use luajit to run all Lua snippets
-set-option global luar_interpreter luajit
+lua -debug %val{client} %{
+    local keys = "%ssomethingcanything<ret>"
+    kak.execute_keys(keys)
+    kak.echo("Word something replaced by word anything on client " .. arg[1])
+    kak.write()
+}
 ----
 
-== Some examples
+would print the following text in the debug buffer:
 
-Suppose you want to execute `ctags-update-tags` whenever you write to a
-file, but only if there’s already a `tags` file in the current
+----
+luar: execute-keys %☾%ssomethingcanything<ret>☾
+luar: echo %☾Word something replaced by word anything on client client0☾
+luar: write
+----
+
+=== Some examples
+
+The following examples are for didactic purposes. There are other ways
+to achieve the same results.
+
+Suppose you want to execute `ctags-update-tags` whenever you write to
+a file, but only if there’s already a `tags` file in the current
 directory. Using `:lua` you can write the following lines to your
 `kakrc`:
 
@@ -188,4 +266,14 @@ define-command highlight-search-toggle %{
 }
 
 map global normal <F2> ': highlight-search-toggle<ret>'
+----
+
+=== Configuration
+
+You can also change the Lua interpreter used by this plugin by changing
+the `luar_interpreter` option, e.g.:
+
+----
+# use luajit to run all Lua snippets
+set-option global luar_interpreter luajit
 ----

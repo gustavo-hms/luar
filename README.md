@@ -111,7 +111,9 @@ As you can see, hyphens are replaced by underscores in command names. Luar also 
 
 Anything you can do with the `lua` command you can do with the equivalent `fennel` command. So, to replace your selections with the string `"Olá!"`:
 ```fennel
-fennel %("Olá!")
+fennel %{
+  "Olá!"
+}
 ```
 Or, to replace three selections with some numbers:
 ```fennel
