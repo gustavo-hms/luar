@@ -239,12 +239,19 @@ You can find more examples [searching Github by topic](https://github.com/search
 
 ## Installation
 
-You must have a `lua` interpreter installed on your system. Then you can add the following line to your `kakrc` (supposing you use [plug.kak](https://github.com/robertmeta/plug.kak)):
+You must have a `lua` interpreter installed on your system.
+
+Then, if you use [Almoxarife](https://github.com/gustavo-hms/almoxarife), add this to its configuration file:
+
+```yaml
+luar:
+  location: https://github.com/gustavo-hms/luar
+```
+
+Or, if you use [kak-bundle](https://codeberg.org/jdugan6240/kak-bundle), add this to your `kakrc`:
 
 ```kak
-plug "gustavo-hms/luar" %{
-    require-module luar
-}
+bundle luar "gustavo-hms/luar"
 ```
 
 ## Configuration
